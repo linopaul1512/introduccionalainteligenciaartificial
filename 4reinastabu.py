@@ -2,18 +2,18 @@ import random
 import pandas as pd
 from copy import deepcopy
 
-N_REINAS = 4
-N_MAX = 6
-TAM_TABU = 2
+nreinas = 4
+nmax = 6
+tamtabu = 2
 
 # Generar solución inicial
-def generar_individuo():
-    ind = list(range(1, N_REINAS + 1))
+def GenerarIndividuo():
+    ind = list(range(1, nreinas + 1))
     random.shuffle(ind)
     return ind
 
 # Calcular colisiones diagonales (fitness)
-def calcular_fitness(ind):
+def CalcularFitness(ind):
     colisiones = 0
     for i in range(len(ind)):
         for j in range(i + 1, len(ind)):
@@ -22,10 +22,10 @@ def calcular_fitness(ind):
     return colisiones
 
 # Imprimir tablero
-def imprimir_tablero(individuo):
-    for fila in range(1, N_REINAS + 1):
+def ImprimirTablero(individuo):
+    for fila in range(1, nreinas + 1):
         linea = ""
-        for col in range(1, N_REINAS + 1):
+        for col in range(1, nreinas + 1):
             if individuo[col - 1] == fila:
                 linea += "♕ "
             else:
@@ -34,33 +34,33 @@ def imprimir_tablero(individuo):
     print()
 
 # Generar vecindario (todos los intercambios de 2 posiciones)
-def generar_vecindario(solucion_actual):
+def GenerarVecindario(solucion_actual):
     vecinos = []
-    for i in range(N_REINAS):
-        for j in range(i + 1, N_REINAS):
+    for i in range(nreinas):
+        for j in range(i + 1, nreinas):
             vecino = solucion_actual.copy()
             vecino[i], vecino[j] = vecino[j], vecino[i]
             vecinos.append((vecino, (i, j)))
     return vecinos
 
 # Algoritmo de búsqueda tabú
-def busqueda_tabu():
-    actual = generar_individuo()
-    mejor_sol = actual
-    mejor_fit = calcular_fitness(actual)
+def BusquedaTabu():
+    actual = GenerarIndividuo()
+    mejorsol = actual
+    mejorfit = CalcularFitness(actual)
 
     tabu = []
 
-    print("\n🔷 Solución inicial:", actual)
-    imprimir_tablero(actual)
+    print("\n Solución inicial:", actual)
+    ImprimirTablero(actual)
 
-    for iteracion in range(N_MAX):
-        print(f"================== Iteración {iteracion} ==================")
-        vecinos = generar_vecindario(actual)
+    for iteracion in range(nmax):
+        print(f"*************** Iteración {iteracion}**************")
+        vecinos = GenerarVecindario(actual)
         candidatos = []
 
         for vecino, movimiento in vecinos:
-            fit = calcular_fitness(vecino)
+            fit = CalcularFitness(vecino)
             if movimiento not in tabu:
                 candidatos.append((vecino, fit, movimiento))
 
@@ -72,21 +72,20 @@ def busqueda_tabu():
 
         print(f"Mejor movimiento: intercambio {movimiento}, fitness = {fit}")
         print(f"Nueva solución: {vecino}")
-        imprimir_tablero(vecino)
+        ImprimirTablero(vecino)
 
         actual = vecino
         tabu.append(movimiento)
-        if len(tabu) > TAM_TABU:
+        if len(tabu) > tamtabu:
             tabu.pop(0)
 
-        if fit < mejor_fit:
-            mejor_fit = fit
-            mejor_sol = vecino
+        if fit < mejorfit:
+            mejorfit = fit
+            mejorsol = vecino
 
     print("\nBúsqueda finalizada.")
-    print("Mejor solución encontrada:", mejor_sol, "con", mejor_fit, "colisiones")
-    imprimir_tablero(mejor_sol)
-    return mejor_sol
+    print("Mejor solución encontrada:", mejorsol, "con", mejorfit, "colisiones")
+    ImprimirTablero(mejorsol)
+    return mejorsol
 
-# Ejecutar
-solucion = busqueda_tabu()
+BusquedaTabu()

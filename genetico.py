@@ -38,11 +38,11 @@ def algoritmo_genetico():
     for gen in range(1, generaciones + 1):
         print(f"\n==== Generación {gen} ====")
 
-        # 2) Evaluar fitness
+        #Evaluar fitness
         fitness_vals = [x**3 - 2*x + 3 for x in poblacion]
         total_f = sum(fitness_vals)
 
-        # 3) Calcular probabilidades individuales y acumuladas
+        #Calcular probabilidades individuales y acumuladas
         probs = [f / total_f if total_f > 0 else 0 for f in fitness_vals]
         probsacum = []
         acum = 0
@@ -51,7 +51,7 @@ def algoritmo_genetico():
             acum += p
             probsacum.append(acum)
 
-        # 4) Mostrar tabla con pandas
+        #Mostrar tabla con pandas
         df = pd.DataFrame({
             'Valor': poblacion,
             'Fitness': fitness_vals,
@@ -60,7 +60,7 @@ def algoritmo_genetico():
         })
         print(df)
 
-        # 5) Generar nueva población
+        #Generar nueva población
         nueva = []
         while len(nueva) < poblaciontamano:
             # Selección por ruleta
@@ -84,7 +84,7 @@ def algoritmo_genetico():
                 hijo_bin, bit = mutar_binario(pad_bin)
                 hijo = decodificar(hijo_bin)
                 print(f"Mutación: padre={padre} ({pad_bin}), bit invertido={bit} -> hijo={hijo} ({hijo_bin})")
-                 #l hijo mutado debe estar dentro del dominio válido, si no lo está, se reemplaza
+
                 if -1 <= hijo <= 5:
                     nueva.append(hijo)
                 else:
@@ -103,9 +103,8 @@ def algoritmo_genetico():
                         else:
                             nueva.append(random.randint(-1, 5))
 
-        # 6) Reemplazar población
+        #Reemplazar población
         poblacion = nueva
 
-# Ejecutar
 if __name__ == "__main__":
     algoritmo_genetico()
