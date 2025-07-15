@@ -17,16 +17,16 @@ matrizcostos = [
 ]
 
 def CalcularCosto(ruta):
-    costo_total = 0
+    costototal = 0
     for i in range(len(ruta) - 1):
         costo = matrizcostos[ruta[i]][ruta[i + 1]]
         if costo == 0:
             return float('inf')
-        costo_total += costo
+        costototal += costo
     retorno = matrizcostos[ruta[-1]][ruta[0]]
     if retorno == 0:
         return float('inf')
-    return costo_total + retorno
+    return costototal + retorno
 
 def RutaInicialValida():
     from itertools import permutations
@@ -36,81 +36,81 @@ def RutaInicialValida():
     return None
 
 # Escoge nodo inicial y final usando ruleta
-def EscogerIndicesPorRuleta(nodos_disponibles):
-    prob = 1 / len(nodos_disponibles)
+def EscogerIndicesPorRuleta(nodosdisponibles):
+    prob = 1 / len(nodosdisponibles)
     ruleta = []
     acumulado = 0
-    for nodo in nodos_disponibles:
+    for nodo in nodosdisponibles:
         ruleta.append((acumulado, acumulado + prob, nodo))
         acumulado += prob
     r = random.random()
     for (ini, fin, nodo) in ruleta:
         if ini <= r < fin:
             return nodo
-    return nodos_disponibles[-1]
+    return nodosdisponibles[-1]
 
 def ObtenerVecino(ruta):
     for intento in range(10):  # Hasta 10 intentos para generar un vecino distinto
-        nodos_validos = ruta[1:-1]
-        nodo_ini = EscogerIndicesPorRuleta(nodos_validos)
-        idx_ini = ruta.index(nodo_ini)
+        nodosvalidos = ruta[1:-1]
+        nodoini = EscogerIndicesPorRuleta(nodosvalidos)
+        idxini = ruta.index(nodoini)
 
-        posibles_finales = ruta[idx_ini + 1:-1]
-        if not posibles_finales:
+        posiblesfinales = ruta[idxini + 1:-1]
+        if not posiblesfinales:
             continue
-        nodo_fin = EscogerIndicesPorRuleta(posibles_finales)
+        nodo_fin = EscogerIndicesPorRuleta(posiblesfinales)
         idx_fin = ruta.index(nodo_fin)
 
-        if idx_ini >= idx_fin:
+        if idxini >= idx_fin:
             continue
 
-        subruta = ruta[idx_ini:idx_fin + 1]
+        subruta = ruta[idxini:idx_fin + 1]
         subruta_invertida = subruta[::-1]
 
-        nueva = ruta[:idx_ini] + subruta_invertida + ruta[idx_fin + 1:]
+        nueva = ruta[:idxini] + subruta_invertida + ruta[idx_fin + 1:]
 
         if nueva != ruta and CalcularCosto(nueva) != float('inf'):
             return nueva
-    return ruta  # Si no se pudo generar uno distinto válido
+    return ruta 
 
 def Recocido():
-    ruta_actual = RutaInicialValida()
-    if ruta_actual is None:
+    rutaactual = RutaInicialValida()
+    if rutaactual is None:
         print("No se encontró una ruta inicial válida.")
         return
 
-    zc = CalcularCosto(ruta_actual)
-    mejor_ruta = ruta_actual[:]
-    mejor_costo = zc
+    zc = CalcularCosto(rutaactual)
+    mejorruta = rutaactual[:]
+    mejorcosto = zc
 
-    # Temperaturas fijas como sugirió Clavel
+    # Temperaturas
     t1 = 0.2 * zc
     T = [t1]
     for _ in range(4):
         T.append(0.5 * T[-1])
 
-    print("*** Ruta inicial:", [ciudades[i] for i in ruta_actual], "Costo:", zc)
+    print("*** Ruta inicial:", [ciudades[i] for i in rutaactual], "Costo:", zc)
         
     for i, temp in enumerate(T):
         print(f"\n*** Iteración {i + 1} con T = {round(temp, 2)}")
-        vecino = ObtenerVecino(ruta_actual)
+        vecino = ObtenerVecino(rutaactual)
         zn = CalcularCosto(vecino)
 
         print("*** Ruta candidata:", [ciudades[i] for i in vecino], "Costo:", zn)
 
         if zn < zc:
             print("*** Mejor vecino encontrado (mejor costo):", zn)
-            ruta_actual = vecino
+            rutaactual = vecino
             zc = zn
-            if zn < mejor_costo:
-                mejor_ruta = vecino
-                mejor_costo = zn
+            if zn < mejorcosto:
+                mejorruta = vecino
+                mejorcosto = zn
         else:
             delta = zc - zn
-            prob_acept = math.exp(delta / temp)
+            probacept = math.exp(delta / temp)
             r = random.random()
-            print(f" Zn > Zc. Δ={delta:.2f}, Probabilidad de aceptación={round(prob_acept, 3)}, r={round(r, 3)}")
-            if r < prob_acept:
+            print(f" Zn > Zc. Δ={delta:.2f}, Probabilidad de aceptación={round(probacept, 3)}, r={round(r, 3)}")
+            if r < probacept:
                 print(" *** Se acepta solución peor por probabilidad. ***")
                 ruta_actual = vecino
                 zc = zn
@@ -119,7 +119,7 @@ def Recocido():
 
         print("*** Ruta actual:", [ciudades[i] for i in ruta_actual], "Costo:", zc)
 
-    print("\n*** Mejor ruta encontrada:", [ciudades[i] for i in mejor_ruta])
-    print("*** Costo total:", mejor_costo)
+    print("\n*** Mejor ruta encontrada:", [ciudades[i] for i in mejorruta])
+    print("*** Costo total:", mejorcosto)
 
 solucion = Recocido()
